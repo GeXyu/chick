@@ -1,5 +1,5 @@
 /*
- * $Id: Mapper.java, 2018年7月18日 下午1:38:42 XiuYu.Ge Exp $
+ * $Id: Value.java, 2018年7月10日 下午7:09:09 XiuYu.Ge Exp $
  * 
  * Copyright (c) 2012 zzcode Technologies Co.,Ltd 
  * All rights reserved.
@@ -8,25 +8,25 @@
  * specified, unless otherwise noted, and may not be reproduced or distributed
  * in whole or in part in any form or medium without express written permission.
  */
-package cn.zzocde.api;
+package cn.zzcode.core.api;
 
-import cn.zzocde.common.HttpRequest;
+import cn.zzcode.common.HttpRequest;
+import cn.zzcode.common.HttpResponse;
 
 /**
  * <p>
- * Title: Mapper
+ * Title: Value
  * </p>
  * <p>
- * Description:映射器
+ * Description:
  * </p>
  * 
  * @author XiuYu.Ge
- * @created 2018年7月18日 下午1:38:42
+ * @created 2018年7月10日 下午7:09:09
  * @modified [who date description]
  * @check [who date description]
  */
-public interface Mapper {
+public interface Value {
 
-    Container map(HttpRequest request, boolean update);
-
+    void invoke(HttpRequest request, HttpResponse response, ValueContext valueContext);
 }

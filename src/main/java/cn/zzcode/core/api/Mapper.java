@@ -1,5 +1,5 @@
 /*
- * $Id: ValueContext.java, 2018年7月18日 下午1:37:40 XiuYu.Ge Exp $
+ * $Id: Mapper.java, 2018年7月13日 下午12:32:22 XiuYu.Ge Exp $
  * 
  * Copyright (c) 2012 zzcode Technologies Co.,Ltd 
  * All rights reserved.
@@ -8,25 +8,29 @@
  * specified, unless otherwise noted, and may not be reproduced or distributed
  * in whole or in part in any form or medium without express written permission.
  */
-package cn.zzocde.api;
+package cn.zzcode.core.api;
 
-import cn.zzocde.common.HttpRequest;
-import cn.zzocde.common.HttpResponse;
+import cn.zzcode.common.HttpRequest;
 
 /**
  * <p>
- * Title: ValueContext
+ * Title: Mapper
  * </p>
  * <p>
  * Description:
  * </p>
  * 
  * @author XiuYu.Ge
- * @created 2018年7月18日 下午1:37:40
+ * @created 2018年7月13日 下午12:32:22
  * @modified [who date description]
  * @check [who date description]
  */
-public interface ValueContext {
+public interface Mapper {
 
-    void nextInvoke(HttpRequest request, HttpResponse response, ValueContext context);
+    Container map(HttpRequest request, boolean update);
+
+    void setContainer(Container container);
+
+    Container getContainer();
+
 }

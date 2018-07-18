@@ -1,5 +1,5 @@
 /*
- * $Id: Container.java, 2018年7月18日 下午1:24:06 XiuYu.Ge Exp $
+ * $Id: Container.java, 2018年7月10日 下午7:09:55 XiuYu.Ge Exp $
  * 
  * Copyright (c) 2012 zzcode Technologies Co.,Ltd 
  * All rights reserved.
@@ -8,69 +8,68 @@
  * specified, unless otherwise noted, and may not be reproduced or distributed
  * in whole or in part in any form or medium without express written permission.
  */
-package cn.zzocde.api;
+package cn.zzcode.core.api;
 
-import cn.zzocde.common.HttpRequest;
-import cn.zzocde.common.HttpResponse;
+import cn.zzcode.common.HttpRequest;
+import cn.zzcode.common.HttpResponse;
 
 /**
  * <p>
  * Title: Container
  * </p>
  * <p>
- * Description:容器抽象
+ * Description:容器顶级抽象
  * </p>
  * 
  * @author XiuYu.Ge
- * @created 2018年7月18日 下午1:24:06
+ * @created 2018年7月10日 下午7:09:55
  * @modified [who date description]
  * @check [who date description]
  */
 public interface Container {
 
+    void invoke(HttpRequest request, HttpResponse response);
+
     /**
-     * 设置父
+     * 设置父容器
      * 
      * @param container
      */
     void setParent(Container container);
 
     /**
-     * 得到子
+     * 得到夫容器
      * 
-     * @return
+     * @param container
      */
     Container getParent();
 
     /**
-     * 
-     * @param child
-     */
-    void addChild(Container child);
-
-    /**
+     * 获取子
      * 
      * @param name
      * @return
      */
-    Container getChild(String name);
+    Container findChild(String name);
 
     /**
+     * 添加子容器
+     * 
+     * @param container
+     */
+    void addChild(Container container);
+
+    /**
+     * 设置容器名
      * 
      * @param name
      */
     void setName(String name);
 
     /**
+     * 得到容器名
      * 
      * @return
      */
     String getName();
-
-    /**
-     * 
-     * @param request
-     * @param response
-     */
-    void invoke(HttpRequest request, HttpResponse response);
 }
