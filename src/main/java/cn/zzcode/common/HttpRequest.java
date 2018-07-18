@@ -530,7 +530,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#getRequestURI()
      */
     public String getRequestURI() {
-        return "/test"; // TODO
+        return "/"; // TODO
     }
 
     /**
@@ -544,7 +544,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#getServletPath()
      */
     public String getServletPath() {
-        return "/itomcat/test";
+        return "/";
     }
 
     /**

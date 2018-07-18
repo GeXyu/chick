@@ -10,8 +10,6 @@
  */
 package cn.zzcode.common;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,6 +17,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -38,13 +37,8 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.web.util.WebUtils;
 
 /**
  * <p>
@@ -69,6 +63,45 @@ public class HttpServletContext implements ServletContext {
 
     public Map<String, ServletRegistration> servletRegistrationMap = new HashMap<String, ServletRegistration>();
 
+    private Map<String, Filter> filterRegistationMap = new HashMap<>();
+
+    private static final String COMMON_DEFAULT_SERVLET_NAME = "default";
+
+    private static final Set<SessionTrackingMode> DEFAULT_SESSION_TRACKING_MODES = new LinkedHashSet<SessionTrackingMode>(
+            3);
+
+    static {
+        DEFAULT_SESSION_TRACKING_MODES.add(SessionTrackingMode.COOKIE);
+        DEFAULT_SESSION_TRACKING_MODES.add(SessionTrackingMode.URL);
+        DEFAULT_SESSION_TRACKING_MODES.add(SessionTrackingMode.SSL);
+    }
+
+    private final Log logger = LogFactory.getLog(getClass());
+
+    private String contextPath = "";
+
+    private final Map<String, ServletContext> contexts = new HashMap<String, ServletContext>();
+
+    private int majorVersion = 3;
+
+    private int minorVersion = 0;
+
+    private int effectiveMajorVersion = 3;
+
+    private int effectiveMinorVersion = 0;
+
+    private final Map<String, RequestDispatcher> namedRequestDispatchers = new HashMap<String, RequestDispatcher>();
+
+    private String defaultServletName = COMMON_DEFAULT_SERVLET_NAME;
+
+    private final Map<String, String> initParameters = new LinkedHashMap<String, String>();
+
+    private final Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+
+    private String servletContextName = "HttServletContext";
+
+    private final Set<String> declaredRoles = new LinkedHashSet<String>();
+
     public String getVirtualServerName() {
         return null;
     }
@@ -83,7 +116,7 @@ public class HttpServletContext implements ServletContext {
         classNameMap.put(servletName, className);
         HttpServletRegistration myServletRegistration = new HttpServletRegistration(this);
         servletRegistrationMap.put(servletName, myServletRegistration);
-        return new HttpDynamic(myServletRegistration);
+        return new HttpServletDynamic(myServletRegistration);
     }
 
     @Override
@@ -91,7 +124,7 @@ public class HttpServletContext implements ServletContext {
         servletMap.put(servletName, servlet);
         HttpServletRegistration myServletRegistration = new HttpServletRegistration(this);
         servletRegistrationMap.put(servletName, myServletRegistration);
-        return new HttpDynamic(myServletRegistration);
+        return new HttpServletDynamic(myServletRegistration);
     }
 
     @Override
@@ -99,7 +132,7 @@ public class HttpServletContext implements ServletContext {
         servletClassMap.put(servletName, servletClass);
         HttpServletRegistration myServletRegistration = new HttpServletRegistration(this);
         servletRegistrationMap.put(servletName, myServletRegistration);
-        return new HttpDynamic(myServletRegistration);
+        return new HttpServletDynamic(myServletRegistration);
     }
 
     @Override
@@ -126,21 +159,28 @@ public class HttpServletContext implements ServletContext {
 
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName, String className) {
+        System.out.println("add fileter FilterRegistration.Dynamic addFilter(String filterName, String className)");
         return null;
     }
 
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
-        return null;
+        filterRegistationMap.put(filterName, filter);
+        HttpFilterRegistration httpFilterRegistration = new HttpFilterRegistration(this);
+        httpFilterRegistration.setName(filterName);
+        return new HttpFilterDynamic(httpFilterRegistration);
     }
 
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
+        System.out.println(
+                "add fileter FilterRegistration.Dynamic addFilter(String filterName, Class<? extends Filter> filterClass)");
         return null;
     }
 
     @Override
     public <T extends Filter> T createFilter(Class<T> c) throws ServletException {
+        System.out.println("craete fileter");
         return null;
     }
 
@@ -151,153 +191,31 @@ public class HttpServletContext implements ServletContext {
 
     @Override
     public void addListener(Class<? extends EventListener> listenerClass) {
+        System.out.println("add fileter void addListener(Class<? extends EventListener> listenerClass)");
         return;
     }
 
     @Override
     public void addListener(String className) {
+        System.out.println("add fileter");
         return;
     }
 
     @Override
     public <T extends EventListener> void addListener(T t) {
+        System.out.println("add fileter");
         return;
     }
 
     @Override
     public <T extends EventListener> T createListener(Class<T> c) throws ServletException {
+        System.out.println("add fileter");
         return null;
     }
 
     @Override
     public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
         return Collections.emptyMap();
-    }
-
-    /**
-     * Default Servlet name used by Tomcat, Jetty, JBoss, and GlassFish:
-     * {@value}.
-     */
-    private static final String COMMON_DEFAULT_SERVLET_NAME = "default";
-
-    private static final String TEMP_DIR_SYSTEM_PROPERTY = "java.io.tmpdir";
-
-    private static final Set<SessionTrackingMode> DEFAULT_SESSION_TRACKING_MODES = new LinkedHashSet<SessionTrackingMode>(
-            3);
-
-    static {
-        DEFAULT_SESSION_TRACKING_MODES.add(SessionTrackingMode.COOKIE);
-        DEFAULT_SESSION_TRACKING_MODES.add(SessionTrackingMode.URL);
-        DEFAULT_SESSION_TRACKING_MODES.add(SessionTrackingMode.SSL);
-    }
-
-    private final Log logger = LogFactory.getLog(getClass());
-
-    private final ResourceLoader resourceLoader;
-
-    private final String resourceBasePath;
-
-    private String contextPath = "";
-
-    private final Map<String, ServletContext> contexts = new HashMap<String, ServletContext>();
-
-    private int majorVersion = 3;
-
-    private int minorVersion = 0;
-
-    private int effectiveMajorVersion = 3;
-
-    private int effectiveMinorVersion = 0;
-
-    private final Map<String, RequestDispatcher> namedRequestDispatchers = new HashMap<String, RequestDispatcher>();
-
-    private String defaultServletName = COMMON_DEFAULT_SERVLET_NAME;
-
-    private final Map<String, String> initParameters = new LinkedHashMap<String, String>();
-
-    private final Map<String, Object> attributes = new LinkedHashMap<String, Object>();
-
-    private String servletContextName = "MockServletContext";
-
-    private final Set<String> declaredRoles = new LinkedHashSet<String>();
-
-    private Set<SessionTrackingMode> sessionTrackingModes;
-
-    // private final SessionCookieConfig sessionCookieConfig = new
-    // MockSessionCookieConfig();
-
-    /**
-     * Create a new {@code MockServletContext}, using no base path and a
-     * {@link DefaultResourceLoader} (i.e. the classpath root as WAR root).
-     * 
-     * @see org.springframework.core.io.DefaultResourceLoader
-     */
-    public HttpServletContext() {
-        this("", null);
-    }
-
-    /**
-     * Create a new {@code MockServletContext}, using a
-     * {@link DefaultResourceLoader}.
-     * 
-     * @param resourceBasePath
-     *            the root directory of the WAR (should not end with a slash)
-     * @see org.springframework.core.io.DefaultResourceLoader
-     */
-    public HttpServletContext(String resourceBasePath) {
-        this(resourceBasePath, null);
-    }
-
-    /**
-     * Create a new {@code MockServletContext}, using the specified
-     * {@link ResourceLoader} and no base path.
-     * 
-     * @param resourceLoader
-     *            the ResourceLoader to use (or null for the default)
-     */
-    public HttpServletContext(ResourceLoader resourceLoader) {
-        this("", resourceLoader);
-    }
-
-    /**
-     * Create a new {@code MockServletContext} using the supplied resource base
-     * path and resource loader.
-     * <p>
-     * Registers a {@link MockRequestDispatcher} for the Servlet named
-     * {@literal 'default'}.
-     * 
-     * @param resourceBasePath
-     *            the root directory of the WAR (should not end with a slash)
-     * @param resourceLoader
-     *            the ResourceLoader to use (or null for the default)
-     * @see #registerNamedDispatcher
-     */
-    public HttpServletContext(String resourceBasePath, ResourceLoader resourceLoader) {
-        this.resourceLoader = (resourceLoader != null ? resourceLoader : new DefaultResourceLoader());
-        this.resourceBasePath = (resourceBasePath != null ? resourceBasePath : "");
-
-        // Use JVM temp dir as ServletContext temp dir.
-        String tempDir = System.getProperty(TEMP_DIR_SYSTEM_PROPERTY);
-        if (tempDir != null) {
-            this.attributes.put(WebUtils.TEMP_DIR_CONTEXT_ATTRIBUTE, new File(tempDir));
-        }
-
-        registerNamedDispatcher(this.defaultServletName, new HttpRequestDispatcher(this.defaultServletName));
-    }
-
-    /**
-     * Build a full resource location for the given path, prepending the
-     * resource base path of this {@code MockServletContext}.
-     * 
-     * @param path
-     *            the path as specified
-     * @return the full resource path
-     */
-    protected String getResourceLocation(String path) {
-        if (!path.startsWith("/")) {
-            path = "/" + path;
-        }
-        return this.resourceBasePath + path;
     }
 
     public void setContextPath(String contextPath) {
@@ -357,28 +275,6 @@ public class HttpServletContext implements ServletContext {
         return this.effectiveMinorVersion;
     }
 
-    /**
-     * This method uses the default
-     * {@link javax.activation.FileTypeMap#getDefaultFileTypeMap() FileTypeMap}
-     * from the Java Activation Framework to resolve MIME types.
-     * <p>
-     * The Java Activation Framework returns {@code "application/octet-stream"}
-     * if the MIME type is unknown (i.e., it never returns {@code null}). Thus,
-     * in order to honor the {@link ServletContext#getMimeType(String)}
-     * contract, this method returns {@code null} if the MIME type is
-     * {@code "application/octet-stream"}.
-     * <p>
-     * {@code MockServletContext} does not provide a direct mechanism for
-     * setting a custom MIME type; however, if the default {@code FileTypeMap}
-     * is an instance of {@code javax.activation.MimetypesFileTypeMap}, a custom
-     * MIME type named {@code text/enigma} can be registered for a custom
-     * {@code .puzzle} file extension in the following manner:
-     * 
-     * <pre style="code">
-     * MimetypesFileTypeMap mimetypesFileTypeMap = (MimetypesFileTypeMap) FileTypeMap.getDefaultFileTypeMap();
-     * mimetypesFileTypeMap.addMimeTypes("text/enigma    puzzle");
-     * </pre>
-     */
     @Override
     public String getMimeType(String filePath) {
         String mimeType = FileTypeMap.getDefaultFileTypeMap().getContentType(filePath);
@@ -387,57 +283,20 @@ public class HttpServletContext implements ServletContext {
 
     @Override
     public Set<String> getResourcePaths(String path) {
-        String actualPath = (path.endsWith("/") ? path : path + "/");
-        Resource resource = this.resourceLoader.getResource(getResourceLocation(actualPath));
-        try {
-            File file = resource.getFile();
-            String[] fileList = file.list();
-            if (ObjectUtils.isEmpty(fileList)) {
-                return null;
-            }
-            Set<String> resourcePaths = new LinkedHashSet<String>(fileList.length);
-            for (String fileEntry : fileList) {
-                String resultPath = actualPath + fileEntry;
-                if (resource.createRelative(fileEntry).getFile().isDirectory()) {
-                    resultPath += "/";
-                }
-                resourcePaths.add(resultPath);
-            }
-            return resourcePaths;
-        } catch (IOException ex) {
-            logger.warn("Couldn't get resource paths for " + resource, ex);
-            return null;
-        }
+        return new HashSet<>();
+
     }
 
     @Override
     public URL getResource(String path) throws MalformedURLException {
-        Resource resource = this.resourceLoader.getResource(getResourceLocation(path));
-        if (!resource.exists()) {
-            return null;
-        }
-        try {
-            return resource.getURL();
-        } catch (MalformedURLException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            logger.warn("Couldn't get URL for " + resource, ex);
-            return null;
-        }
+        return null;
+
     }
 
     @Override
     public InputStream getResourceAsStream(String path) {
-        Resource resource = this.resourceLoader.getResource(getResourceLocation(path));
-        if (!resource.exists()) {
-            return null;
-        }
-        try {
-            return resource.getInputStream();
-        } catch (IOException ex) {
-            logger.warn("Couldn't open InputStream for " + resource, ex);
-            return null;
-        }
+        return null;
+
     }
 
     @Override
@@ -551,13 +410,16 @@ public class HttpServletContext implements ServletContext {
 
     @Override
     public String getRealPath(String path) {
-        Resource resource = this.resourceLoader.getResource(getResourceLocation(path));
-        try {
-            return resource.getFile().getAbsolutePath();
-        } catch (IOException ex) {
-            logger.warn("Couldn't determine real path of resource " + resource, ex);
-            return null;
-        }
+        return path;
+        // Resource resource =
+        // this.resourceLoader.getResource(getResourceLocation(path));
+        // try {
+        // return resource.getFile().getAbsolutePath();
+        // } catch (IOException ex) {
+        // logger.warn("Couldn't determine real path of resource " + resource,
+        // ex);
+        // return null;
+        // }
     }
 
     @Override
@@ -646,24 +508,30 @@ public class HttpServletContext implements ServletContext {
     }
 
     @Override
-    public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes)
-            throws IllegalStateException, IllegalArgumentException {
-        this.sessionTrackingModes = sessionTrackingModes;
-    }
-
-    @Override
     public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
         return DEFAULT_SESSION_TRACKING_MODES;
     }
 
     @Override
-    public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
-        return (this.sessionTrackingModes != null ? Collections.unmodifiableSet(this.sessionTrackingModes)
-                : DEFAULT_SESSION_TRACKING_MODES);
+    public SessionCookieConfig getSessionCookieConfig() {
+        return null;
     }
 
+    /**
+     * @see javax.servlet.ServletContext#setSessionTrackingModes(java.util.Set)
+     */
     @Override
-    public SessionCookieConfig getSessionCookieConfig() {
+    public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * @see javax.servlet.ServletContext#getEffectiveSessionTrackingModes()
+     */
+    @Override
+    public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
+        // TODO Auto-generated method stub
         return null;
     }
 

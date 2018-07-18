@@ -31,7 +31,7 @@ import javax.servlet.ServletSecurityElement;
  * @modified [who date description]
  * @check [who date description]
  */
-public class HttpDynamic implements ServletRegistration.Dynamic {
+public class HttpServletDynamic implements ServletRegistration.Dynamic {
 
     private HttpServletRegistration myServletRegistration;
 
@@ -39,7 +39,7 @@ public class HttpDynamic implements ServletRegistration.Dynamic {
 
     private boolean asyncSupported;
 
-    public HttpDynamic(HttpServletRegistration myServletRegistration) {
+    public HttpServletDynamic(HttpServletRegistration myServletRegistration) {
         this.myServletRegistration = myServletRegistration;
     }
 

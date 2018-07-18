@@ -20,7 +20,7 @@ public class App {
     }
 
     // ---
-    @RequestMapping("test")
+    @RequestMapping("/")
     public String test() {
         System.out.println("test funcation");
         return "return test ";
