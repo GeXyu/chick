@@ -32,7 +32,6 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
-import javax.servlet.ServletRegistration.Dynamic;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
@@ -667,73 +666,5 @@ public class HttpServletContext implements ServletContext {
     public SessionCookieConfig getSessionCookieConfig() {
         return null;
     }
-
-    /**
-     * @see javax.servlet.ServletContext#addJspFile(java.lang.String,
-     *      java.lang.String)
-     */
-    @Override
-    public Dynamic addJspFile(String servletName, String jspFile) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * @see javax.servlet.ServletContext#getSessionTimeout()
-     */
-    @Override
-    public int getSessionTimeout() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    /**
-     * @see javax.servlet.ServletContext#setSessionTimeout(int)
-     */
-    @Override
-    public void setSessionTimeout(int sessionTimeout) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * @see javax.servlet.ServletContext#getRequestCharacterEncoding()
-     */
-    @Override
-    public String getRequestCharacterEncoding() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * @see javax.servlet.ServletContext#setRequestCharacterEncoding(java.lang.String)
-     */
-    @Override
-    public void setRequestCharacterEncoding(String encoding) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * @see javax.servlet.ServletContext#getResponseCharacterEncoding()
-     */
-    @Override
-    public String getResponseCharacterEncoding() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * @see javax.servlet.ServletContext#setResponseCharacterEncoding(java.lang.String)
-     */
-    @Override
-    public void setResponseCharacterEncoding(String encoding) {
-        // TODO Auto-generated method stub
-
-    }
-
-    // ---------------------------------------------------------------------
-    // Unsupported Servlet 3.0 registration methods
-    // ---------------------------------------------------------------------
 
 }
