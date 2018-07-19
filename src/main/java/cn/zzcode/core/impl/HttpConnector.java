@@ -227,10 +227,49 @@ public class HttpConnector {
         String requestURL = handleUrl(methodInfo).trim();
         request.setRequestURL(requestURL);
 
+        // 处理参数
+        String parseQueryString = parseQueryString(requestURL);
+        request.setQueryString(parseQueryString);
+
+        // 处理参数map
+        Map<String, String> parameters = pasrseParameters(parseQueryString);
+        request.setParameters(parameters);
+
         // 设置请求头
         Map<String, String> headerMap = handleHeader(requstLine);
         request.setHeaders(headerMap);
         return request;
+    }
+
+    /**
+     * @param parseQueryString
+     */
+    private Map<String, String> pasrseParameters(String parseQueryString) {
+        Map<String, String> result = new HashMap<>();
+        if (parseQueryString.length() > 0) {
+            String[] split = parseQueryString.split("&");
+            for (String parameter : split) {
+                int indexOf = parameter.indexOf("=");
+                String key = parameter.substring(0, indexOf);
+                String value = parameter.substring(indexOf + 1, parameter.length());
+                result.put(key, value);
+            }
+        }
+        return result;
+
+    }
+
+    /**
+     * 处理参数
+     * 
+     * @param requestURL
+     */
+    private String parseQueryString(String requestURL) {
+        int indexOf = requestURL.indexOf("?");
+        if (indexOf > 0) {
+            return requestURL.substring(indexOf + 1);
+        }
+        return "";
     }
 
     /**

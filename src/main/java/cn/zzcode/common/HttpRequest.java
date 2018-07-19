@@ -530,7 +530,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#getRequestURI()
      */
     public String getRequestURI() {
-        return "/"; // TODO
+        return this.requestURL;
     }
 
     /**
@@ -551,7 +551,6 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#getSession(boolean)
      */
     public HttpSession getSession(boolean create) {
-        // TODO Auto-generated method stub
         return null;
     }
 
