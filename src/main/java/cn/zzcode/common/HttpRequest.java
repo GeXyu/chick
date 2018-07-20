@@ -52,21 +52,27 @@ import javax.servlet.http.Part;
 public class HttpRequest implements HttpServletRequest {
 
     // 头
+    private static String CHARACTERENCODING = "UTF-8";
+
     private Map<String, String> headers = new HashMap<String, String>();
 
     private Map<String, String> parameters = new HashMap<String, String>();
 
     private Map<String, Object> attributes = new HashMap<String, Object>();
 
-    @SuppressWarnings("unused")
     private String queryString;
 
-    private String requestURL;
+    private String requestURI;
 
+    // method get post put
     private String method;
 
-    private String characterEncoding = "UTF-8";
+    // http or https
+    private String protocol;
 
+    private int port;
+
+    private String host;
     //
 
     /**
@@ -74,6 +80,21 @@ public class HttpRequest implements HttpServletRequest {
      */
     public Object getAttribute(String name) {
         return attributes.get(name);
+    }
+
+    /**
+     * @return the attributes
+     */
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    /**
+     * @param attributes
+     *            the attributes to set
+     */
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
     }
 
     /**
@@ -88,8 +109,8 @@ public class HttpRequest implements HttpServletRequest {
      * @param requestURL
      *            the requestURL to set
      */
-    public void setRequestURL(String requestURL) {
-        this.requestURL = requestURL;
+    public void setRequestURI(String requestURI) {
+        this.requestURI = requestURI;
     }
 
     /**
@@ -127,14 +148,14 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getCharacterEncoding()
      */
     public String getCharacterEncoding() {
-        return this.characterEncoding;
+        return CHARACTERENCODING;
     }
 
     /**
      * @see javax.servlet.ServletRequest#setCharacterEncoding(java.lang.String)
      */
     public void setCharacterEncoding(String env) throws UnsupportedEncodingException {
-        this.characterEncoding = env;
+        CHARACTERENCODING = env;
     }
 
     /**
@@ -492,7 +513,7 @@ public class HttpRequest implements HttpServletRequest {
      */
     public String getQueryString() {
         // TODO Auto-generated method stub
-        return null;
+        return this.queryString;
     }
 
     /**
@@ -523,21 +544,26 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#getRequestedSessionId()
      */
     public String getRequestedSessionId() {
-        return this.requestURL;
+        return this.requestURI;
     }
 
     /**
      * @see javax.servlet.http.HttpServletRequest#getRequestURI()
      */
     public String getRequestURI() {
-        return this.requestURL;
+        return this.requestURI;
     }
 
     /**
      * @see javax.servlet.http.HttpServletRequest#getRequestURL()
      */
     public StringBuffer getRequestURL() {
-        return new StringBuffer().append(this.requestURL);
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(protocol);
+        stringBuffer.append(getHost());
+        stringBuffer.append(getPort());
+        stringBuffer.append(getRequestURI());
+        return stringBuffer;
     }
 
     /**
@@ -673,4 +699,43 @@ public class HttpRequest implements HttpServletRequest {
     public void addParameter(String key, String value) {
         parameters.put(key, value);
     }
+
+    /**
+     * @param protocol
+     *            the protocol to set
+     */
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    /**
+     * @return the port
+     */
+    public int getPort() {
+        return port;
+    }
+
+    /**
+     * @param port
+     *            the port to set
+     */
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    /**
+     * @return the host
+     */
+    public String getHost() {
+        return host;
+    }
+
+    /**
+     * @param host
+     *            the host to set
+     */
+    public void setHost(String host) {
+        this.host = host;
+    }
+
 }

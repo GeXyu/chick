@@ -220,12 +220,23 @@ public class HttpConnector {
         ArrayList<String> requstLine = new ArrayList<String>(Arrays.asList(requestStr.split("\n")));
         String methodInfo = requstLine.remove(0);
 
+        // 设置请求头
+        Map<String, String> headerMap = handleHeader(requstLine);
+        request.setHeaders(headerMap);
+
         // 设置方法
         String method = handleMethodType(methodInfo).trim();
         request.setMethod(method);
 
+        // 设置http
+        String protocol = parseProtocol(methodInfo);
+        request.setProtocol(protocol);
+
         String requestURL = handleUrl(methodInfo).trim();
-        request.setRequestURL(requestURL);
+
+        // uri
+        String parseRequestUrl = parseRequestUrl(requestURL);
+        request.setRequestURI(parseRequestUrl);
 
         // 处理参数
         String parseQueryString = parseQueryString(requestURL);
@@ -235,10 +246,27 @@ public class HttpConnector {
         Map<String, String> parameters = pasrseParameters(parseQueryString);
         request.setParameters(parameters);
 
-        // 设置请求头
-        Map<String, String> headerMap = handleHeader(requstLine);
-        request.setHeaders(headerMap);
         return request;
+    }
+
+    /**
+     * @param methodInfo
+     */
+    private String parseProtocol(String methodInfo) {
+        int indexOf = methodInfo.indexOf("HTTP");
+        int lastIndexOf = methodInfo.lastIndexOf("/");
+        return methodInfo.substring(indexOf, lastIndexOf);
+    }
+
+    /**
+     * @param requestURL
+     */
+    private String parseRequestUrl(String requestURL) {
+        int indexOf = requestURL.indexOf("?");
+        if (indexOf > 0) {
+            return requestURL.substring(0, indexOf);
+        }
+        return requestURL;
     }
 
     /**
