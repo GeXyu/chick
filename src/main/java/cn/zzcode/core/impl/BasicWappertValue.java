@@ -52,6 +52,9 @@ public class BasicWappertValue implements Value {
     public void invoke(HttpRequest request, HttpResponse response, ValueContext valueContext) {
         SimpleWrapper warpper = (SimpleWrapper) container;
         Servlet servlet = warpper.loadServlet();
+
+        //createFilterChain(request, servlet);
+
         try {
             servlet.service(request, response);
         } catch (ServletException e) {

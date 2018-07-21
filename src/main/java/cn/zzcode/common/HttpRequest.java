@@ -73,7 +73,16 @@ public class HttpRequest implements HttpServletRequest {
     private int port;
 
     private String host;
+
+    private ServletContext servletContext;
     //
+
+    /**
+     * @param servletContext2
+     */
+    public HttpRequest(ServletContext servletContext) {
+        this.servletContext = servletContext;
+    }
 
     /**
      * @see javax.servlet.ServletRequest#getAttribute(java.lang.String)
@@ -140,8 +149,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getAttributeNames()
      */
     public Enumeration<String> getAttributeNames() {
-        // TODO Auto-generated method stub
-        return null;
+        return new Enumerator(headers.keySet());
     }
 
     /**
@@ -187,6 +195,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getInputStream()
      */
     public ServletInputStream getInputStream() throws IOException {
+
         return null;
     }
 
@@ -208,7 +217,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getParameterValues(java.lang.String)
      */
     public String[] getParameterValues(String name) {
-        return null;
+        return parameters.values().toArray(new String[parameters.size()]);
     }
 
     /**
@@ -222,7 +231,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getProtocol()
      */
     public String getProtocol() {
-        return null;
+        return this.protocol;
     }
 
     /**
@@ -236,7 +245,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getServerName()
      */
     public String getServerName() {
-        return "ITOMCAT";
+        return "NEST";
     }
 
     /**
@@ -291,7 +300,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#removeAttribute(java.lang.String)
      */
     public void removeAttribute(String name) {
-
+        attributes.remove(name);
     }
 
     /**
@@ -319,7 +328,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getRequestDispatcher(java.lang.String)
      */
     public RequestDispatcher getRequestDispatcher(String path) {
-        return null;
+        return new HttpRequestDispatcher(path);
     }
 
     /**
@@ -373,7 +382,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getServletContext()
      */
     public ServletContext getServletContext() {
-        return new HttpServletContext();
+        return servletContext;
     }
 
     /**
@@ -488,7 +497,6 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#getPathInfo()
      */
     public String getPathInfo() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -496,7 +504,6 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#getPathTranslated()
      */
     public String getPathTranslated() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -504,7 +511,6 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#getContextPath()
      */
     public String getContextPath() {
-        // TODO Auto-generated method stub
         return "/itomcat/test";
     }
 
@@ -512,7 +518,6 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#getQueryString()
      */
     public String getQueryString() {
-        // TODO Auto-generated method stub
         return this.queryString;
     }
 
@@ -520,7 +525,6 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#getRemoteUser()
      */
     public String getRemoteUser() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -738,4 +742,11 @@ public class HttpRequest implements HttpServletRequest {
         this.host = host;
     }
 
+    /**
+     * @param servletContext
+     *            the servletContext to set
+     */
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
+    }
 }

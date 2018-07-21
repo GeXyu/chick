@@ -39,6 +39,8 @@ public class HttpFilterRegistration implements FilterRegistration {
 
     private String name;
 
+    private FilterDef filterDef = null;
+
     private Set<String> mappingForServletNames = new HashSet<>();
 
     private Set<String> mappingForUrlPatterns = new HashSet<>();
@@ -46,8 +48,9 @@ public class HttpFilterRegistration implements FilterRegistration {
     /**
      * @param httpServletContext
      */
-    public HttpFilterRegistration(HttpServletContext httpServletContext) {
+    public HttpFilterRegistration(HttpServletContext httpServletContext, FilterDef filterDef) {
         this.servletContext = httpServletContext;
+        this.filterDef = filterDef;
     }
 
     /**
@@ -111,8 +114,8 @@ public class HttpFilterRegistration implements FilterRegistration {
     public void addMappingForServletNames(EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
             String... servletNames) {
         for (String servletName : servletNames) {
-            System.out.println("add " + servletName);
             mappingForServletNames.add(servletName);
+            filterDef.addServlet(servletName);
         }
     }
 
@@ -131,9 +134,9 @@ public class HttpFilterRegistration implements FilterRegistration {
     @Override
     public void addMappingForUrlPatterns(EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
             String... urlPatterns) {
-
         for (String url : urlPatterns) {
             mappingForUrlPatterns.add(url);
+            filterDef.addUrl(url);
         }
     }
 
@@ -166,6 +169,21 @@ public class HttpFilterRegistration implements FilterRegistration {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * @return the filterDef
+     */
+    public FilterDef getFilterDef() {
+        return filterDef;
+    }
+
+    /**
+     * @param filterDef
+     *            the filterDef to set
+     */
+    public void setFilterDef(FilterDef filterDef) {
+        this.filterDef = filterDef;
     }
 
 }

@@ -11,12 +11,16 @@
 package cn.zzcode.core.impl;
 
 import java.io.IOException;
+import java.util.List;
 
+import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 
+import cn.zzcode.common.HttpFilterChain;
 import cn.zzcode.common.HttpRequest;
 import cn.zzcode.common.HttpResponse;
+import cn.zzcode.common.HttpServletContext;
 import cn.zzcode.core.api.Container;
 import cn.zzcode.core.api.Context;
 import cn.zzcode.core.api.Value;
@@ -52,19 +56,33 @@ public class BasicContextValue implements Value {
      *      cn.zzcode.common.HttpResponse, cn.zzcode.core.api.ValueContext)
      */
     public void invoke(HttpRequest request, HttpResponse response, ValueContext valueContext) {
-        Context warpper = (Context) container;
-        Wrapper simpleWarrper = (Wrapper) warpper.getMapper().map(request, false);
-
+        Context context = (Context) container;
+        Wrapper simpleWarrper = (Wrapper) context.getMapper().map(request, false);
         Servlet loadServlet = simpleWarrper.loadServlet();
-        try {
-            loadServlet.service(request, response);
 
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        HttpFilterChain createFilterChain = createFilterChain(loadServlet, request);
+        try {
+            createFilterChain.doFilter(request, response);
+        } catch (IOException | ServletException e) {
             e.printStackTrace();
         }
 
+    }
+
+    /**
+     * @param loadServlet
+     * @param request
+     */
+    private HttpFilterChain createFilterChain(Servlet loadServlet, HttpRequest request) {
+
+        HttpServletContext servletContext = (HttpServletContext) request.getServletContext();
+        List<Filter> mattchURLFilter = servletContext.mattchURLFilter(request);
+
+        HttpFilterChain httpFilterChain = new HttpFilterChain();
+        httpFilterChain.setFilterChain(httpFilterChain);
+        httpFilterChain.setFilters(mattchURLFilter);
+        httpFilterChain.setServlet(loadServlet);
+        return httpFilterChain;
     }
 
 }

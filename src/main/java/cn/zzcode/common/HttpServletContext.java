@@ -13,6 +13,7 @@ package cn.zzcode.common;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.EventListener;
@@ -20,8 +21,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.activation.FileTypeMap;
 import javax.servlet.Filter;
@@ -63,7 +66,9 @@ public class HttpServletContext implements ServletContext {
 
     public Map<String, ServletRegistration> servletRegistrationMap = new HashMap<String, ServletRegistration>();
 
-    private Map<String, Filter> filterRegistationMap = new HashMap<>();
+    private Map<String, Filter> filterMap = new HashMap<>();
+
+    private Set<FilterDef> filterDefs = new HashSet<>();
 
     private static final String COMMON_DEFAULT_SERVLET_NAME = "default";
 
@@ -165,8 +170,17 @@ public class HttpServletContext implements ServletContext {
 
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
-        filterRegistationMap.put(filterName, filter);
-        HttpFilterRegistration httpFilterRegistration = new HttpFilterRegistration(this);
+
+        System.out.println("filterName: " + filterName);
+        System.out.println("filter:" + filter);
+        filterMap.put(filterName, filter);
+
+        FilterDef filterDef = new FilterDef();
+        filterDef.setName(filterName);
+        filterDef.setFilterClass(String.valueOf(filter.getClass()));
+        filterDefs.add(filterDef);
+
+        HttpFilterRegistration httpFilterRegistration = new HttpFilterRegistration(this, filterDef);
         httpFilterRegistration.setName(filterName);
         return new HttpFilterDynamic(httpFilterRegistration);
     }
@@ -533,6 +547,24 @@ public class HttpServletContext implements ServletContext {
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public List<Filter> mattchURLFilter(HttpRequest request) {
+        String requestURI = request.getRequestURI();
+
+        Set<Filter> filters = new HashSet<>();
+        for (FilterDef def : filterDefs) {
+            Set<String> urls = def.getUrls();
+
+            for (String url : urls) {
+                System.out.println("url: " + url);
+                if (Pattern.matches(url, requestURI)) {
+                    Filter filter = filterMap.get(def.getName());
+                    filters.add(filter);
+                }
+            }
+        }
+        return new ArrayList<>(filters);
     }
 
 }
