@@ -574,7 +574,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#getServletPath()
      */
     public String getServletPath() {
-        return "/";
+        return this.requestURI;
     }
 
     /**

@@ -81,7 +81,7 @@ public class HttpFilterChain implements FilterChain {
         int sub = cursor;
         cursor++;
         if (sub < filters.size()) {
-            filterChain.doFilter(request, response);
+            filters.get(sub).doFilter(request, response, this);
         } else {
             servlet.service(request, response);
         }

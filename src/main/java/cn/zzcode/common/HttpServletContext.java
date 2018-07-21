@@ -557,8 +557,8 @@ public class HttpServletContext implements ServletContext {
             Set<String> urls = def.getUrls();
 
             for (String url : urls) {
-                System.out.println("url: " + url);
-                if (Pattern.matches(url, requestURI)) {
+                String reg = url.replace("/", ".");
+                if (Pattern.matches(reg, requestURI)) {
                     Filter filter = filterMap.get(def.getName());
                     filters.add(filter);
                 }

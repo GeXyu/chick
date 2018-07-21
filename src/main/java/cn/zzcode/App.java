@@ -20,7 +20,7 @@ public class App {
     public FilterRegistrationBean filters() {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setFilter(new TestFilter());
-        registration.addUrlPatterns("/*");
+        registration.addUrlPatterns("/test/*");
         return registration;
     }
 
