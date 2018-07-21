@@ -10,7 +10,9 @@
  */
 package cn.zzcode.common;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
@@ -29,6 +31,12 @@ import javax.servlet.ServletInputStream;
  * @check [who date description]
  */
 public class HttpServletInputStream extends ServletInputStream {
+
+    private ByteArrayInputStream byteStream;
+
+    public HttpServletInputStream(ByteBuffer byteBuffer) {
+        byteStream = new ByteArrayInputStream(byteBuffer.array());
+    }
 
     /**
      * @see javax.servlet.ServletInputStream#isFinished()
@@ -62,7 +70,8 @@ public class HttpServletInputStream extends ServletInputStream {
      */
     @Override
     public int read() throws IOException {
-        return 0;
+
+        return byteStream.read();
     }
 
 }

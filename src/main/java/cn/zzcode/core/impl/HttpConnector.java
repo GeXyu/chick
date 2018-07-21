@@ -159,8 +159,8 @@ public class HttpConnector {
                 // flip方法将Buffer从写模式切换到读模式
                 buffer.flip();
                 CharBuffer charBuffer = decoder.decode(buffer);
-
                 HttpRequest request = parseRequest(charBuffer);
+                request.setByteBuffer(buffer);
 
                 // String requstStr = charBuffer.toString();
                 // System.out.println(requstStr);

@@ -13,6 +13,7 @@ package cn.zzcode.common;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -76,6 +77,8 @@ public class HttpRequest implements HttpServletRequest {
 
     private ServletContext servletContext;
     //
+
+    private ByteBuffer byteBuffer;
 
     /**
      * @param servletContext2
@@ -195,8 +198,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getInputStream()
      */
     public ServletInputStream getInputStream() throws IOException {
-
-        return null;
+        return new HttpServletInputStream(byteBuffer);
     }
 
     /**
@@ -748,5 +750,13 @@ public class HttpRequest implements HttpServletRequest {
      */
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
+    }
+
+    /**
+     * @param byteBuffer
+     *            the byteBuffer to set
+     */
+    public void setByteBuffer(ByteBuffer byteBuffer) {
+        this.byteBuffer = byteBuffer;
     }
 }
