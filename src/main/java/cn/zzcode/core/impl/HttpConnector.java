@@ -166,9 +166,11 @@ public class HttpConnector {
                 // System.out.println(requstStr);
 
                 HttpResponse httpResponse = new HttpResponse();
-                getContainer().invoke(request, httpResponse);
-                // 解析
+                httpResponse.setBuffer(ByteBuffer.allocate(1024));
 
+                getContainer().invoke(request, httpResponse);
+
+                key.attach(httpResponse);
                 // 改变自身关注事件，可以用位或操作|组合时间
                 key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
 
@@ -190,10 +192,18 @@ public class HttpConnector {
 
             SocketChannel client = (SocketChannel) key.channel();
 
+            HttpResponse httpResponse = (HttpResponse) key.attachment();
+            ByteBuffer writerBuffer = httpResponse.getBuffer();
+            writerBuffer.flip();
+            String result = new String(writerBuffer.array(), "UTF-8").trim();
+
             StringBuffer buffer = new StringBuffer();
             buffer.append("HTTP/1.1 200 OK" + "\r\n");
+            buffer.append("Connection: keep-alive" + "\r\n");
+            buffer.append("Content-Type: " + httpResponse.getContentType() + "\r\n");
+            buffer.append("Server: nest" + "\r\n");
             buffer.append("\r\n");
-            buffer.append(" response ");
+            buffer.append(result);
 
             ByteBuffer block = ByteBuffer.wrap(buffer.toString().getBytes());
             client.write(block);

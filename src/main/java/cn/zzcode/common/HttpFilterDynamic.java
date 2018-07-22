@@ -58,7 +58,6 @@ public class HttpFilterDynamic implements Dynamic {
      */
     @Override
     public Collection<String> getServletNameMappings() {
-        System.out.println("serlvet name mappings");
         return filterRegistration.getServletNameMappings();
     }
 
@@ -77,7 +76,6 @@ public class HttpFilterDynamic implements Dynamic {
      */
     @Override
     public Collection<String> getUrlPatternMappings() {
-        System.out.println("serlvet url patter");
         return filterRegistration.getUrlPatternMappings();
     }
 

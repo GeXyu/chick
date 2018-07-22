@@ -57,7 +57,26 @@ public class HttpServletOutputStream extends ServletOutputStream {
     @Override
     public void write(int b) throws IOException {
         buffer.put((byte) b);
+    }
 
+    /**
+     * @see java.io.OutputStream#write(byte[])
+     */
+    @Override
+    public void write(byte[] b) throws IOException {
+        buffer.put(b);
+    }
+
+    /**
+     * @see java.io.OutputStream#write(byte[], int, int)
+     */
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        buffer.put(b, off, len);
+    }
+
+    public HttpServletOutputStream(ByteBuffer buffer) {
+        this.buffer = buffer;
     }
 
 }

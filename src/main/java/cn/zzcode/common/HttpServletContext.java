@@ -164,15 +164,12 @@ public class HttpServletContext implements ServletContext {
 
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName, String className) {
-        System.out.println("add fileter FilterRegistration.Dynamic addFilter(String filterName, String className)");
         return null;
     }
 
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
 
-        System.out.println("filterName: " + filterName);
-        System.out.println("filter:" + filter);
         filterMap.put(filterName, filter);
 
         FilterDef filterDef = new FilterDef();
@@ -187,8 +184,6 @@ public class HttpServletContext implements ServletContext {
 
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
-        System.out.println(
-                "add fileter FilterRegistration.Dynamic addFilter(String filterName, Class<? extends Filter> filterClass)");
         return null;
     }
 

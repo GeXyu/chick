@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -254,7 +255,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getServerPort()
      */
     public int getServerPort() {
-        String host = headers.get("Host");
+        String host = headers.get("host");
         if (host != null) {
             String port = host.substring(host.indexOf(":"));
             if (port != null) {
@@ -275,7 +276,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getRemoteAddr()
      */
     public String getRemoteAddr() {
-        return headers.get("Host");
+        return headers.get("host");
     }
 
     /**
@@ -351,7 +352,7 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getLocalName()
      */
     public String getLocalName() {
-        String host = headers.get("Host");
+        String host = headers.get("host");
         if (host != null) {
             return host.substring(0, host.indexOf(":"));
 
@@ -363,14 +364,14 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getLocalAddr()
      */
     public String getLocalAddr() {
-        return headers.get("Host");
+        return headers.get("host");
     }
 
     /**
      * @see javax.servlet.ServletRequest#getLocalPort()
      */
     public int getLocalPort() {
-        String host = headers.get("Host");
+        String host = headers.get("host");
         if (host != null) {
             String port = host.substring(host.indexOf(":"));
             if (port != null) {
@@ -470,7 +471,9 @@ public class HttpRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#getHeaders(java.lang.String)
      */
     public Enumeration<String> getHeaders(String name) {
-        return new Enumerator(new HashSet<String>(headers.values()));
+
+        String[] array = { headers.get(name) };
+        return new Enumerator( Arrays.asList(array));
     }
 
     /**

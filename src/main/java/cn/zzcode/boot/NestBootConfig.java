@@ -79,7 +79,6 @@ public class NestBootConfig {
 
         HttpConnector connector = new HttpConnector();
         connector.setContainer(context);
-        System.out.println("itomcat run ....");
         return connector;
     }
 

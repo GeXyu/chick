@@ -12,8 +12,11 @@ package cn.zzcode.common;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -34,11 +37,18 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class HttpResponse implements HttpServletResponse {
 
+    private Map<String, String> headers = new HashMap<String, String>();
+
+    private int status;
+
+    private ByteBuffer buffer;
+
+    private String contentType;
+
     /**
      * @see javax.servlet.ServletResponse#getCharacterEncoding()
      */
     public String getCharacterEncoding() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -46,16 +56,14 @@ public class HttpResponse implements HttpServletResponse {
      * @see javax.servlet.ServletResponse#getContentType()
      */
     public String getContentType() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.contentType;
     }
 
     /**
      * @see javax.servlet.ServletResponse#getOutputStream()
      */
     public ServletOutputStream getOutputStream() throws IOException {
-        System.out.println("getOutputStream");
-        return null;
+        return new HttpServletOutputStream(buffer);
     }
 
     /**
@@ -70,7 +78,6 @@ public class HttpResponse implements HttpServletResponse {
      * @see javax.servlet.ServletResponse#setCharacterEncoding(java.lang.String)
      */
     public void setCharacterEncoding(String charset) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -78,7 +85,6 @@ public class HttpResponse implements HttpServletResponse {
      * @see javax.servlet.ServletResponse#setContentLength(int)
      */
     public void setContentLength(int len) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -86,7 +92,6 @@ public class HttpResponse implements HttpServletResponse {
      * @see javax.servlet.ServletResponse#setContentLengthLong(long)
      */
     public void setContentLengthLong(long len) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -94,15 +99,13 @@ public class HttpResponse implements HttpServletResponse {
      * @see javax.servlet.ServletResponse#setContentType(java.lang.String)
      */
     public void setContentType(String type) {
-        System.out.println("setContentType");
-
+        this.contentType = type;
     }
 
     /**
      * @see javax.servlet.ServletResponse#setBufferSize(int)
      */
     public void setBufferSize(int size) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -110,7 +113,6 @@ public class HttpResponse implements HttpServletResponse {
      * @see javax.servlet.ServletResponse#getBufferSize()
      */
     public int getBufferSize() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
@@ -258,7 +260,7 @@ public class HttpResponse implements HttpServletResponse {
      *      java.lang.String)
      */
     public void setHeader(String name, String value) {
-        // TODO Auto-generated method stub
+        headers.put(name, value);
 
     }
 
@@ -267,8 +269,7 @@ public class HttpResponse implements HttpServletResponse {
      *      java.lang.String)
      */
     public void addHeader(String name, String value) {
-        // TODO Auto-generated method stub
-
+        headers.put(name, value);
     }
 
     /**
@@ -293,8 +294,7 @@ public class HttpResponse implements HttpServletResponse {
      * @see javax.servlet.http.HttpServletResponse#setStatus(int)
      */
     public void setStatus(int sc) {
-        // TODO Auto-generated method stub
-
+        this.status = sc;
     }
 
     /**
@@ -302,31 +302,27 @@ public class HttpResponse implements HttpServletResponse {
      *      java.lang.String)
      */
     public void setStatus(int sc, String sm) {
-        // TODO Auto-generated method stub
-
+        this.status = sc;
     }
 
     /**
      * @see javax.servlet.http.HttpServletResponse#getStatus()
      */
     public int getStatus() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.status;
     }
 
     /**
      * @see javax.servlet.http.HttpServletResponse#getHeader(java.lang.String)
      */
     public String getHeader(String name) {
-        // TODO Auto-generated method stub
-        return null;
+        return headers.get(name);
     }
 
     /**
      * @see javax.servlet.http.HttpServletResponse#getHeaders(java.lang.String)
      */
     public Collection<String> getHeaders(String name) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -334,8 +330,7 @@ public class HttpResponse implements HttpServletResponse {
      * @see javax.servlet.http.HttpServletResponse#getHeaderNames()
      */
     public Collection<String> getHeaderNames() {
-        // TODO Auto-generated method stub
-        return null;
+        return headers.keySet();
     }
 
     /**
@@ -350,8 +345,28 @@ public class HttpResponse implements HttpServletResponse {
      * @param resource
      */
     public void setForwardedUrl(String resource) {
-        // TODO Auto-generated method stub
 
     }
 
+    /**
+     * @param buffer
+     *            the buffer to set
+     */
+    public void setBuffer(ByteBuffer buffer) {
+        this.buffer = buffer;
+    }
+
+    /**
+     * @return the buffer
+     */
+    public ByteBuffer getBuffer() {
+        return buffer;
+    }
+
+    /**
+     * @return the contextType
+     */
+    public String getContextType() {
+        return contentType;
+    }
 }

@@ -10,6 +10,10 @@
  */
 package cn.zzcode;
 
+import java.util.Enumeration;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,7 +35,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     @RequestMapping("add")
-    public void add() {
-        System.out.println("add...");
+    public String add(HttpServletRequest request) {
+        final Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            final String nextElement = headerNames.nextElement();
+            final String header = request.getHeader(nextElement);
+            System.out.println("key:" + nextElement + " value:" + header);
+        }
+        return "add result";
+
     }
 }
