@@ -11,12 +11,14 @@
 package cn.zzcode.core.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 
+import cn.zzcode.common.FilterDef;
 import cn.zzcode.common.HttpFilterChain;
 import cn.zzcode.common.HttpRequest;
 import cn.zzcode.common.HttpResponse;
@@ -75,14 +77,31 @@ public class BasicContextValue implements Value {
      */
     private HttpFilterChain createFilterChain(Servlet loadServlet, HttpRequest request) {
 
-        HttpServletContext servletContext = (HttpServletContext) request.getServletContext();
-        List<Filter> mattchURLFilter = servletContext.mattchURLFilter(request);
+        List<Filter> filters = mattchFilter(request);
 
         HttpFilterChain httpFilterChain = new HttpFilterChain();
         httpFilterChain.setFilterChain(httpFilterChain);
-        httpFilterChain.setFilters(mattchURLFilter);
+        httpFilterChain.setFilters(filters);
         httpFilterChain.setServlet(loadServlet);
         return httpFilterChain;
+    }
+
+    /**
+     * 获取匹配的过滤器
+     * @param request
+     * @return
+     */
+    private List<Filter> mattchFilter(HttpRequest request) {
+        HttpServletContext servletContext = (HttpServletContext) request.getServletContext();
+        Context context = (Context) container;
+        List<FilterDef> filterDefs = context.getFilterByURI(request.getRequestURI());
+
+        List<Filter> filters = new ArrayList<>();
+        for (FilterDef def : filterDefs) {
+            Filter filter = servletContext.getFilter(def.getName());
+            filters.add(filter);
+        }
+        return filters;
     }
 
 }

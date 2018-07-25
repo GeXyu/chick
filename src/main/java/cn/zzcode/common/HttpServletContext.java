@@ -13,7 +13,6 @@ package cn.zzcode.common;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.EventListener;
@@ -21,10 +20,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import javax.activation.FileTypeMap;
 import javax.servlet.Filter;
@@ -42,6 +39,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+
+import cn.zzcode.core.api.Container;
+import cn.zzcode.core.api.Context;
+import cn.zzcode.core.api.Wrapper;
 
 /**
  * <p>
@@ -65,10 +66,6 @@ public class HttpServletContext implements ServletContext {
     private Map<String, Class<? extends Servlet>> servletClassMap = new HashMap<String, Class<? extends Servlet>>();
 
     public Map<String, ServletRegistration> servletRegistrationMap = new HashMap<String, ServletRegistration>();
-
-    private Map<String, Filter> filterMap = new HashMap<>();
-
-    private Set<FilterDef> filterDefs = new HashSet<>();
 
     private static final String COMMON_DEFAULT_SERVLET_NAME = "default";
 
@@ -103,9 +100,17 @@ public class HttpServletContext implements ServletContext {
 
     private final Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
+    private Map<String, Filter> filters = new LinkedHashMap<String, Filter>();
+
     private String servletContextName = "HttServletContext";
 
+    private Context context;
+
     private final Set<String> declaredRoles = new LinkedHashSet<String>();
+
+    public HttpServletContext(Context context) {
+        this.context = context;
+    }
 
     public String getVirtualServerName() {
         return null;
@@ -121,6 +126,14 @@ public class HttpServletContext implements ServletContext {
         classNameMap.put(servletName, className);
         HttpServletRegistration myServletRegistration = new HttpServletRegistration(this);
         servletRegistrationMap.put(servletName, myServletRegistration);
+
+        // 添加到父容器
+        Container warrper = context.findChild(servletName);
+        if (warrper == null) {
+            Wrapper child = context.createWrapper();
+            child.setName(servletName);
+            child.setClassName(className);
+        }
         return new HttpServletDynamic(myServletRegistration);
     }
 
@@ -129,6 +142,14 @@ public class HttpServletContext implements ServletContext {
         servletMap.put(servletName, servlet);
         HttpServletRegistration myServletRegistration = new HttpServletRegistration(this);
         servletRegistrationMap.put(servletName, myServletRegistration);
+
+        // 添加到父容器
+        Container warrper = context.findChild(servletName);
+        if (warrper == null) {
+            Wrapper child = context.createWrapper();
+            child.setName(servletName);
+            child.setClassName(String.valueOf(servlet.getClass()));
+        }
         return new HttpServletDynamic(myServletRegistration);
     }
 
@@ -137,6 +158,14 @@ public class HttpServletContext implements ServletContext {
         servletClassMap.put(servletName, servletClass);
         HttpServletRegistration myServletRegistration = new HttpServletRegistration(this);
         servletRegistrationMap.put(servletName, myServletRegistration);
+
+        // 添加到父容器
+        Container warrper = context.findChild(servletName);
+        if (warrper == null) {
+            Wrapper child = context.createWrapper();
+            child.setName(servletName);
+            child.setClassName(String.valueOf(servletClass));
+        }
         return new HttpServletDynamic(myServletRegistration);
     }
 
@@ -170,16 +199,20 @@ public class HttpServletContext implements ServletContext {
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
 
-        filterMap.put(filterName, filter);
+        filters.put(filterName, filter);
 
-        FilterDef filterDef = new FilterDef();
-        filterDef.setName(filterName);
-        filterDef.setFilterClass(String.valueOf(filter.getClass()));
-        filterDefs.add(filterDef);
+        // ---
+        FilterDef filterDef = new FilterDef(filterName, String.valueOf(filter.getClass()));
+        context.addFilterDef(filterDef);
 
+        // ----
         HttpFilterRegistration httpFilterRegistration = new HttpFilterRegistration(this, filterDef);
         httpFilterRegistration.setName(filterName);
         return new HttpFilterDynamic(httpFilterRegistration);
+    }
+
+    public Filter getFilter(String filterName) {
+        return filters.get(filterName);
     }
 
     @Override
@@ -189,7 +222,6 @@ public class HttpServletContext implements ServletContext {
 
     @Override
     public <T extends Filter> T createFilter(Class<T> c) throws ServletException {
-        System.out.println("craete fileter");
         return null;
     }
 
@@ -200,25 +232,21 @@ public class HttpServletContext implements ServletContext {
 
     @Override
     public void addListener(Class<? extends EventListener> listenerClass) {
-        System.out.println("add fileter void addListener(Class<? extends EventListener> listenerClass)");
         return;
     }
 
     @Override
     public void addListener(String className) {
-        System.out.println("add fileter");
         return;
     }
 
     @Override
     public <T extends EventListener> void addListener(T t) {
-        System.out.println("add fileter");
         return;
     }
 
     @Override
     public <T extends EventListener> T createListener(Class<T> c) throws ServletException {
-        System.out.println("add fileter");
         return null;
     }
 
@@ -531,7 +559,6 @@ public class HttpServletContext implements ServletContext {
      */
     @Override
     public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -540,26 +567,7 @@ public class HttpServletContext implements ServletContext {
      */
     @Override
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
-        // TODO Auto-generated method stub
         return null;
-    }
-
-    public List<Filter> mattchURLFilter(HttpRequest request) {
-        String requestURI = request.getRequestURI();
-
-        Set<Filter> filters = new HashSet<>();
-        for (FilterDef def : filterDefs) {
-            Set<String> urls = def.getUrls();
-
-            for (String url : urls) {
-                String reg = url.replace("/", ".");
-                if (Pattern.matches(reg, requestURI)) {
-                    Filter filter = filterMap.get(def.getName());
-                    filters.add(filter);
-                }
-            }
-        }
-        return new ArrayList<>(filters);
     }
 
 }

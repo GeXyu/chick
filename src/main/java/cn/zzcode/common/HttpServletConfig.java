@@ -76,7 +76,7 @@ public class HttpServletConfig implements ServletConfig {
      *            the name of the servlet
      */
     public HttpServletConfig(ServletContext servletContext, String servletName) {
-        this.servletContext = (servletContext != null ? servletContext : new HttpServletContext());
+        this.servletContext = servletContext;
         this.servletName = servletName;
     }
 

@@ -109,6 +109,15 @@ public class FilterDef {
         super();
     }
 
+    /**
+     * @param filterName
+     * @param valueOf
+     */
+    public FilterDef(String filterName, String filterClass) {
+        this.name = filterName;
+        this.filterClass = filterClass;
+    }
+
     public void addUrl(String url) {
         this.urls.add(url);
     }

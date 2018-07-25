@@ -10,9 +10,17 @@
  */
 package cn.zzcode.core.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 
+import javax.servlet.ServletContext;
+
+import cn.zzcode.common.FilterDef;
 import cn.zzcode.common.HttpRequest;
 import cn.zzcode.common.HttpResponse;
 import cn.zzcode.core.api.Container;
@@ -20,6 +28,7 @@ import cn.zzcode.core.api.Context;
 import cn.zzcode.core.api.Mapper;
 import cn.zzcode.core.api.Pipeline;
 import cn.zzcode.core.api.Value;
+import cn.zzcode.core.api.Wrapper;
 
 /**
  * <p>
@@ -39,6 +48,8 @@ public class SimpleContext implements Context, Pipeline {
     private Pipeline pipeline = new SimplePipeline();
     private Map<String, Container> childs = new HashMap<String, Container>();
     private Map<String, String> servletMappers = new HashMap<String, String>();
+    private List<FilterDef> filterDefs = new ArrayList<FilterDef>();
+    private ServletContext servletContext;
     private Mapper mapper;
     private String name;
 
@@ -156,6 +167,69 @@ public class SimpleContext implements Context, Pipeline {
      */
     public Value getBasic() {
         return pipeline.getBasic();
+    }
+
+    /**
+     * @see cn.zzcode.core.api.Context#addFilterDef(cn.zzcode.common.FilterDef)
+     */
+    @Override
+    public void addFilterDef(FilterDef filterDef) {
+        filterDefs.add(filterDef);
+    }
+
+    /**
+     * @see cn.zzcode.core.api.Context#getFilterDefs()
+     */
+    @Override
+    public List<FilterDef> getFilterDefs() {
+        return filterDefs;
+    }
+
+    /**
+     * @see cn.zzcode.core.api.Context#getFilterByURI(java.lang.String)
+     */
+    @Override
+    public List<FilterDef> getFilterByURI(String uri) {
+
+        Set<FilterDef> result = new HashSet<>();
+        for (FilterDef filterdef : filterDefs) {
+            Set<String> urls = filterdef.getUrls();
+            for (String url : urls) {
+                String reg = uri.replace("/", ".");
+                if (Pattern.matches(reg, url)) {
+                    result.add(filterdef);
+                }
+            }
+        }
+
+        return new ArrayList<>(result);
+    }
+
+    /**
+     * @see cn.zzcode.core.api.Context#createWrapper()
+     */
+    @Override
+    public Wrapper createWrapper() {
+        Wrapper simpleWrapper = new SimpleWrapper();
+        simpleWrapper.setParent(this);
+        simpleWrapper.setLoader(new SimpleLoader());
+        return simpleWrapper;
+    }
+
+    /**
+     * @see cn.zzcode.core.api.Context#getServletContext()
+     */
+    @Override
+    public ServletContext getServletContext() {
+        return this.servletContext;
+    }
+
+    /**
+     * @param servletContext
+     *            the servletContext to set
+     */
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
 
 }

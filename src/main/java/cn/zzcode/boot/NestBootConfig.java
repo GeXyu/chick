@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import cn.zzcode.common.HttpServletConfig;
+import cn.zzcode.common.HttpServletContext;
+import cn.zzcode.core.api.Context;
 import cn.zzcode.core.api.Mapper;
 import cn.zzcode.core.impl.HttpConnector;
 import cn.zzcode.core.impl.SimpleContext;
@@ -53,6 +55,8 @@ public class NestBootConfig {
     @Autowired
     private DispatcherServlet dispatcherServlet;
 
+    private HttpConnector connector = getHttpConnector();
+
     /**
      * 获取
      * 
@@ -75,10 +79,12 @@ public class NestBootConfig {
         context.addServletMapper("/", "org.springframework.web.servlet.DispatcherServlet");
         context.addChild(warrper);
         context.setMapper(mapper);
+        context.setServletContext(new HttpServletContext(context));
         // context.addValue(new RequestValue());
 
-        HttpConnector connector = new HttpConnector();
+        connector = new HttpConnector();
         connector.setContainer(context);
+
         return connector;
     }
 
@@ -90,13 +96,12 @@ public class NestBootConfig {
          */
         @Override
         public EmbeddedServletContainer getEmbeddedServletContainer(ServletContextInitializer... initializers) {
-
-            ServletContext servletContext = HttpConnector.getServletContex();
-            ServletConfig mockServletConfig = new HttpServletConfig();
+            ServletContext servletContext = ((Context) connector.getContainer()).getServletContext();
+            ServletConfig httpServletConfig = new HttpServletConfig(servletContext, dispatcherServlet.getServletName());
             for (ServletContextInitializer initializer : initializers) {
                 try {
                     initializer.onStartup(servletContext);
-                    dispatcherServlet.init(mockServletConfig);
+                    dispatcherServlet.init(httpServletConfig);
                 } catch (ServletException e) {
                     e.printStackTrace();
                 }
@@ -112,7 +117,7 @@ public class NestBootConfig {
         public void start() throws EmbeddedServletContainerException {
 
             try {
-                getHttpConnector().listen();
+                connector.listen();
             } catch (IOException e) {
                 e.printStackTrace();
             }

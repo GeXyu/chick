@@ -33,8 +33,8 @@ import javax.servlet.ServletContext;
 
 import cn.zzcode.common.HttpRequest;
 import cn.zzcode.common.HttpResponse;
-import cn.zzcode.common.HttpServletContext;
 import cn.zzcode.core.api.Container;
+import cn.zzcode.core.api.Context;
 
 /**
  * <p>
@@ -50,8 +50,6 @@ import cn.zzcode.core.api.Container;
  * @check [who date description]
  */
 public class HttpConnector {
-
-    private static ServletContext servletContext = new HttpServletContext();
 
     static int PORT = 8090;
     static int BUFFER_SIZE = 1024;
@@ -229,6 +227,7 @@ public class HttpConnector {
     }
 
     private HttpRequest parseRequest(CharBuffer buffer) {
+        ServletContext servletContext = ((Context) getContainer()).getServletContext();
         HttpRequest request = new HttpRequest(servletContext);
 
         String requestStr = buffer.toString();
@@ -350,8 +349,4 @@ public class HttpConnector {
         return methodInfo.substring(0, indexOf);
     }
 
-    public static ServletContext getServletContex() {
-        return servletContext;
-
-    }
 }

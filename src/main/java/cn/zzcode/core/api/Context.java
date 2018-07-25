@@ -10,6 +10,12 @@
  */
 package cn.zzcode.core.api;
 
+import java.util.List;
+
+import javax.servlet.ServletContext;
+
+import cn.zzcode.common.FilterDef;
+
 /**
  * <p>
  * Title: Context
@@ -45,6 +51,40 @@ public interface Context extends Container {
      */
     void setMapper(Mapper mapper);
 
+    /**
+     * 得到
+     * 
+     * @return
+     */
     Mapper getMapper();
+
+    /**
+     * 添加过滤器
+     * 
+     * @param filterDef
+     */
+    void addFilterDef(FilterDef filterDef);
+
+    /**
+     * 过滤器
+     */
+    List<FilterDef> getFilterDefs();
+
+    /**
+     * 根据过滤器定义
+     * 
+     * @param url
+     * @return
+     */
+    List<FilterDef> getFilterByURI(String url);
+
+    /**
+     * @return
+     */
+    Wrapper createWrapper();
+
+    /**
+     */
+    ServletContext getServletContext();
 
 }
