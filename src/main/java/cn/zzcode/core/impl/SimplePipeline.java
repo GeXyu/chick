@@ -10,8 +10,11 @@
  */
 package cn.zzcode.core.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.ServletException;
 
 import cn.zzcode.common.HttpRequest;
 import cn.zzcode.common.HttpResponse;
@@ -38,10 +41,12 @@ public class SimplePipeline implements Pipeline {
     private List<Value> values = new ArrayList<Value>();
 
     /**
+     * @throws ServletException 
+     * @throws IOException 
      * @see cn.zzcode.core.api.Pipeline#invoke(cn.zzcode.common.HttpRequest,
      *      cn.zzcode.common.HttpResponse)
      */
-    public void invoke(HttpRequest request, HttpResponse response) {
+    public void invoke(HttpRequest request, HttpResponse response) throws IOException, ServletException {
         new SimpleValueContext().invokeNext(request, response);
     }
 
@@ -50,10 +55,12 @@ public class SimplePipeline implements Pipeline {
         private Integer cursor = 0;
 
         /**
+         * @throws ServletException 
+         * @throws IOException 
          * @see cn.zzcode.core.api.ValueContext#invokeNext(cn.zzcode.common.HttpRequest,
          *      cn.zzcode.common.HttpResponse)
          */
-        public void invokeNext(HttpRequest request, HttpResponse response) {
+        public void invokeNext(HttpRequest request, HttpResponse response) throws IOException, ServletException {
             int sub = cursor;
             cursor += 1;
             if (sub < values.size()) {

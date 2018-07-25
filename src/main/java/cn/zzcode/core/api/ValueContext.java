@@ -10,6 +10,10 @@
  */
 package cn.zzcode.core.api;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+
 import cn.zzcode.common.HttpRequest;
 import cn.zzcode.common.HttpResponse;
 
@@ -28,7 +32,5 @@ import cn.zzcode.common.HttpResponse;
  */
 public interface ValueContext {
 
-    
-    void invokeNext(HttpRequest request, HttpResponse response);
-
+    void invokeNext(HttpRequest request, HttpResponse response) throws IOException, ServletException;
 }

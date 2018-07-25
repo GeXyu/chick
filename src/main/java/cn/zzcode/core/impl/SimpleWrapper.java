@@ -10,7 +10,10 @@
  */
 package cn.zzcode.core.impl;
 
+import java.io.IOException;
+
 import javax.servlet.Servlet;
+import javax.servlet.ServletException;
 
 import cn.zzcode.common.HttpRequest;
 import cn.zzcode.common.HttpResponse;
@@ -19,6 +22,7 @@ import cn.zzcode.core.api.Loader;
 import cn.zzcode.core.api.Pipeline;
 import cn.zzcode.core.api.Value;
 import cn.zzcode.core.api.Wrapper;
+import cn.zzcode.exception.NestCoreException;
 
 /**
  * <p>
@@ -48,10 +52,12 @@ public class SimpleWrapper implements Wrapper, Pipeline {
     }
 
     /**
+     * @throws ServletException
+     * @throws IOException
      * @see cn.zzcode.core.api.Container#invoke(cn.zzcode.common.HttpRequest,
      *      cn.zzcode.common.HttpResponse)
      */
-    public void invoke(HttpRequest request, HttpResponse response) {
+    public void invoke(HttpRequest request, HttpResponse response) throws IOException, ServletException {
         pipeline.invoke(request, response);
     }
 
@@ -73,16 +79,14 @@ public class SimpleWrapper implements Wrapper, Pipeline {
      * @see cn.zzcode.core.api.Container#findChild(java.lang.String)
      */
     public Container findChild(String name) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new NestCoreException("no child");
     }
 
     /**
      * @see cn.zzcode.core.api.Container#addChild(cn.zzcode.core.api.Container)
      */
     public void addChild(Container container) {
-        // TODO Auto-generated method stub
-
+        throw new NestCoreException("no child");
     }
 
     /**

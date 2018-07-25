@@ -10,6 +10,7 @@
  */
 package cn.zzcode.core.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 
 import cn.zzcode.common.FilterDef;
 import cn.zzcode.common.HttpRequest;
@@ -58,10 +60,12 @@ public class SimpleContext implements Context, Pipeline {
     }
 
     /**
+     * @throws ServletException
+     * @throws IOException
      * @see cn.zzcode.core.api.Container#invoke(cn.zzcode.common.HttpRequest,
      *      cn.zzcode.common.HttpResponse)
      */
-    public void invoke(HttpRequest request, HttpResponse response) {
+    public void invoke(HttpRequest request, HttpResponse response) throws IOException, ServletException {
         pipeline.invoke(request, response);
     }
 
@@ -120,7 +124,17 @@ public class SimpleContext implements Context, Pipeline {
      * @see cn.zzcode.core.api.Context#getServletMapper(java.lang.String)
      */
     public String getServletMapper(String mapper) {
-        return servletMappers.get(mapper);
+        String serlvetName = servletMappers.get(mapper);
+        if (serlvetName == null) {
+            Set<String> keySet = servletMappers.keySet();
+            for (String key : keySet) {
+                if (mapper.contains(key)) {
+                    return servletMappers.get(key);
+                }
+            }
+        }
+
+        return serlvetName;
     }
 
     /**

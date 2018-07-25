@@ -55,7 +55,7 @@ public class NestBootConfig {
     @Autowired
     private DispatcherServlet dispatcherServlet;
 
-    private HttpConnector connector = getHttpConnector();
+    private HttpConnector connector;
 
     /**
      * 获取
@@ -80,11 +80,9 @@ public class NestBootConfig {
         context.addChild(warrper);
         context.setMapper(mapper);
         context.setServletContext(new HttpServletContext(context));
-        // context.addValue(new RequestValue());
 
         connector = new HttpConnector();
         connector.setContainer(context);
-
         return connector;
     }
 
@@ -96,8 +94,12 @@ public class NestBootConfig {
          */
         @Override
         public EmbeddedServletContainer getEmbeddedServletContainer(ServletContextInitializer... initializers) {
+
+            connector = getHttpConnector();
+            //
             ServletContext servletContext = ((Context) connector.getContainer()).getServletContext();
             ServletConfig httpServletConfig = new HttpServletConfig(servletContext, dispatcherServlet.getServletName());
+
             for (ServletContextInitializer initializer : initializers) {
                 try {
                     initializer.onStartup(servletContext);
@@ -119,6 +121,8 @@ public class NestBootConfig {
             try {
                 connector.listen();
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ServletException e) {
                 e.printStackTrace();
             }
         }

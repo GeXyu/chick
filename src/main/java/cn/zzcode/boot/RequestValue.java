@@ -10,6 +10,10 @@
  */
 package cn.zzcode.boot;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+
 import cn.zzcode.common.HttpRequest;
 import cn.zzcode.common.HttpResponse;
 import cn.zzcode.core.api.Value;
@@ -31,11 +35,13 @@ import cn.zzcode.core.api.ValueContext;
 public class RequestValue implements Value {
 
     /**
+     * @throws ServletException
+     * @throws IOException
      * @see cn.zzcode.core.api.Value#invoke(cn.zzcode.common.HttpRequest,
      *      cn.zzcode.common.HttpResponse, cn.zzcode.core.api.ValueContext)
      */
     @Override
-    public void invoke(HttpRequest request, HttpResponse response, ValueContext valueContext) {
+    public void invoke(HttpRequest request, HttpResponse response, ValueContext valueContext) throws IOException, ServletException {
         // request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE,
         // "/HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE");
         valueContext.invokeNext(request, response);

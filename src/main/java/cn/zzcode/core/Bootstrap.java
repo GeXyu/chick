@@ -12,6 +12,8 @@ package cn.zzcode.core;
 
 import java.io.IOException;
 
+import javax.servlet.ServletException;
+
 import cn.zzcode.core.api.Mapper;
 import cn.zzcode.core.impl.HttpConnector;
 import cn.zzcode.core.impl.SimpleContext;
@@ -34,7 +36,7 @@ import cn.zzcode.core.impl.SimpleWrapper;
  */
 public class Bootstrap {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ServletException {
 
         SimpleWrapper warrper = new SimpleWrapper();
         warrper.setName("cn.xiuyu.TestServlet");

@@ -54,20 +54,19 @@ public class BasicContextValue implements Value {
     }
 
     /**
+     * @throws ServletException
+     * @throws IOException
      * @see cn.zzcode.core.api.Value#invoke(cn.zzcode.common.HttpRequest,
      *      cn.zzcode.common.HttpResponse, cn.zzcode.core.api.ValueContext)
      */
-    public void invoke(HttpRequest request, HttpResponse response, ValueContext valueContext) {
+    public void invoke(HttpRequest request, HttpResponse response, ValueContext valueContext)
+            throws IOException, ServletException {
         Context context = (Context) container;
         Wrapper simpleWarrper = (Wrapper) context.getMapper().map(request, false);
         Servlet loadServlet = simpleWarrper.loadServlet();
 
         HttpFilterChain createFilterChain = createFilterChain(loadServlet, request);
-        try {
-            createFilterChain.doFilter(request, response);
-        } catch (IOException | ServletException e) {
-            e.printStackTrace();
-        }
+        createFilterChain.doFilter(request, response);
 
     }
 
@@ -88,6 +87,7 @@ public class BasicContextValue implements Value {
 
     /**
      * 获取匹配的过滤器
+     * 
      * @param request
      * @return
      */

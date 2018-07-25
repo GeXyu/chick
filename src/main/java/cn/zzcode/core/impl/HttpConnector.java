@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 
 import cn.zzcode.common.HttpRequest;
 import cn.zzcode.common.HttpResponse;
@@ -77,8 +78,9 @@ public class HttpConnector {
      * 即accept()一个socket后，new一个Thread为该socket服务， 此方式适合：CPU密集型的操作，如需要处理大量业务、计算
      *
      * @throws IOException
+     * @throws ServletException 
      */
-    public void listen() throws IOException {
+    public void listen() throws IOException, ServletException {
         openChannel();
         while (true) {
             regiester();
@@ -116,8 +118,10 @@ public class HttpConnector {
     /**
      * 遍历各客户端通道 select()阻塞到至少有一个通道在你注册的事件上就绪了 select(long timeout) 多设置一个阻塞时间(毫秒)
      * selectNow() 不阻塞，有无都返回。
+     * 
+     * @throws ServletException
      */
-    private void process() throws IOException {
+    private void process() throws IOException, ServletException {
 
         if (selector.selectNow() > 0) {
             // 客户端channel的键集合
@@ -140,9 +144,10 @@ public class HttpConnector {
 
         /**
          * @throws IOException
+         * @throws ServletException 
          * @see java.lang.Runnable#run()
          */
-        public void run(SelectionKey key) throws IOException {
+        public void run(SelectionKey key) throws IOException, ServletException {
 
             SocketChannel client = (SocketChannel) key.channel();
             buffer.clear();

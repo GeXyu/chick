@@ -35,14 +35,12 @@ public class SimpleContextMapper implements Mapper {
      * @see cn.zzcode.core.api.Mapper#map(cn.zzcode.common.HttpRequest, boolean)
      */
     public Container map(HttpRequest request, boolean update) {
-        
-        String requestURI = "/";
-        
-        //String requestURI = request.getRequestURI();
+
         SimpleContext contenxt = (SimpleContext) container;
 
+        String requestURI = request.getRequestURI();
         String servletName = contenxt.getServletMapper(requestURI);
-        return  contenxt.findChild(servletName);
+        return contenxt.findChild(servletName);
     }
 
     /**
