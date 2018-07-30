@@ -10,11 +10,14 @@
  */
 package cn.zzcode;
 
-import java.util.Enumeration;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -35,14 +38,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     @RequestMapping("add")
-    public String add(HttpServletRequest request) {
-        final Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            final String nextElement = headerNames.nextElement();
-            final String header = request.getHeader(nextElement);
-            System.out.println("key:" + nextElement + " value:" + header);
-        }
-        return "add result";
+    public String add(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        PrintWriter writer = response.getWriter();
+        writer.write("123");
+        writer.flush();
+        writer.close();
+        return " null";
+    }
 
+    @RequestMapping("login")
+    public String login(HttpServletRequest request, @RequestParam("username") String username,
+            @RequestParam("password") String password) {
+        final String result = request.getParameter("username");
+        System.out.println(result);
+        return username + " -- " + password;
     }
 }

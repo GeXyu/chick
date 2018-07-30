@@ -70,8 +70,7 @@ public class HttpResponse implements HttpServletResponse {
      * @see javax.servlet.ServletResponse#getWriter()
      */
     public PrintWriter getWriter() throws IOException {
-        System.out.println("getWriter");
-        return null;
+        return new HttpPrintWriter(new HttpServletOutputStream(buffer));
     }
 
     /**
